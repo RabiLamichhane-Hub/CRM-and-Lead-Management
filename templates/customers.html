@@ -10,16 +10,16 @@
 <body>
   <!-- Shared navigation. All links open separate HTML pages. -->
   <aside class="sidebar">
-    <a class="brand" href={% url 'dashboard' %}>ClientFlow<span>.</span></a>
+    <a class="brand" href="{% url 'dashboard' %}">ClientFlow<span>.</span></a>
     <p class="eyebrow">WORKSPACE</p>
     <nav aria-label="Main navigation">
-          <a href={% url 'dashboard' %}>Dashboard</a>
-          <a href={% url 'customer_list' %} class="active">Customers</a>
-          <a href={% url 'projects' %}>Projects</a>
-          <a href={% url 'tickets' %}>Tickets</a>
-          <a href={% url 'leads' %}>Leads</a>
-          <a href={% url 'inquiries' %}>Inquiries</a>
-          <a href={% url 'reports' %}>Reports</a>
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'customer_list' %}" class="active">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}">Tickets</a>
+          <a href="{% url 'leads' %}">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
     </nav>
     <p class="sidebar-note"><strong>Administrator</strong><br>Static CRM sample</p>
   </aside>
@@ -29,19 +29,19 @@
       <details class="mobile-menu">
         <summary>☰ Menu</summary>
         <nav aria-label="Phone navigation">
-          <a href={% url 'dashboard' %}>Dashboard</a>
-          <a href={% url 'customer_list' %} class="active">Customers</a>
-          <a href={% url 'projects' %}>Projects</a>
-          <a href={% url 'tickets' %}>Tickets</a>
-          <a href={% url 'leads' %}>Leads</a>
-          <a href={% url 'inquiries' %}>Inquiries</a>
-          <a href={% url 'reports' %}>Reports</a>
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'customer_list' %}" class="active">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}">Tickets</a>
+          <a href="{% url 'leads' %}">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
         </nav>
       </details>
       <span>Workspace / Customers</span>
       <div class="button-row">
-        <a href={% url 'clientAccess' %}>Client portal</a>
-        <a href={% url 'inquiry' %}>Public inquiry</a>
+        <a href="{% url 'clientAccess' %}">Client portal</a>
+        <a href="{% url 'inquiry' %}">Public inquiry</a>
       </div>
     </header>
     <main>
@@ -51,61 +51,35 @@
           <h1>Customers</h1>
           <p>Contact details and connected customer records.</p>
         </div>
-        <a class="button" href={% url 'newCustomer' %}>+ Add customer</a>
+        <a class="button" href="{% url 'newCustomer' %}">+ Add customer</a>
       </div>
-      <!-- Sample records are written directly below. Edit this HTML to change them. -->
+      <!-- Records are rendered from the `customer` queryset passed by customer_view. -->
       <section class="card">
       <div class="table-wrap">
         <table>
           <thead><tr><th>Customer</th><th>Email</th><th>Location</th><th>Projects</th><th>Active tickets</th></tr></thead>
           <tbody>
+            {% for c in customer %}
             <tr>
-              <td data-label="Customer"><a href={% url 'customerDetail'%}>Everest Digital</a><small>Aarav Sharma</small></td>
-              <td data-label="Email">aarav@everest.example</td>
-              <td data-label="Location">Kathmandu, Nepal</td>
-              <td data-label="Projects">1</td>
-              <td data-label="Active tickets">2</td>
+              <td data-label="Customer">
+                <a href="{% url 'customerDetail' c.pk %}">{{ c.company_name }}</a>
+                <small>{{ c.contact_name }}</small>
+              </td>
+              <td data-label="Email">{{ c.email }}</td>
+              <td data-label="Location">{{ c.location }}</td>
+              <td data-label="Projects">{{ c.project_count }}</td>
+              <td data-label="Active tickets">{{ c.active_tickets }}</td>
             </tr>
+            {% empty %}
             <tr>
-              <td data-label="Customer"><strong>Himalayan Ventures</strong><small>Maya Gurung</small></td>
-              <td data-label="Email">maya@himalayan.example</td>
-              <td data-label="Location">Pokhara, Nepal</td>
-              <td data-label="Projects">1</td>
-              <td data-label="Active tickets">1</td>
+              <td colspan="5">No customers yet.</td>
             </tr>
-            <tr>
-              <td data-label="Customer"><strong>Bloom &amp; Co.</strong><small>Nisha Shrestha</small></td>
-              <td data-label="Email">nisha@bloom.example</td>
-              <td data-label="Location">Lalitpur, Nepal</td>
-              <td data-label="Projects">1</td>
-              <td data-label="Active tickets">0</td>
-            </tr>
-            <tr>
-              <td data-label="Customer"><strong>Northstar Studio</strong><small>Rohan Karki</small></td>
-              <td data-label="Email">rohan@northstar.example</td>
-              <td data-label="Location">Bhaktapur, Nepal</td>
-              <td data-label="Projects">1</td>
-              <td data-label="Active tickets">1</td>
-            </tr>
-            <tr>
-              <td data-label="Customer"><strong>Aster Education</strong><small>Sita Thapa</small></td>
-              <td data-label="Email">sita@aster.example</td>
-              <td data-label="Location">Kathmandu, Nepal</td>
-              <td data-label="Projects">1</td>
-              <td data-label="Active tickets">0</td>
-            </tr>
-            <tr>
-              <td data-label="Customer"><strong>Meridian Foods</strong><small>Bikash Rai</small></td>
-              <td data-label="Email">bikash@meridian.example</td>
-              <td data-label="Location">Chitwan, Nepal</td>
-              <td data-label="Projects">0</td>
-              <td data-label="Active tickets">0</td>
-            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
       </section>
-      <footer>ClientFlow · Static UI with dummy data · No backend</footer>
+      <footer>ClientFlow · Customer records</footer>
     </main>
   </div>
   <script src="{% static 'js/app.js' %}"></script>

@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New lead | ClientFlow CRM</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <!-- Shared navigation. All links open separate HTML pages. -->
+  <aside class="sidebar">
+    <a class="brand" href="{% url 'dashboard' %}">ClientFlow<span>.</span></a>
+    <p class="eyebrow">WORKSPACE</p>
+    <nav aria-label="Main navigation">
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}">Tickets</a>
+          <a href="{% url 'leads' %}" class="active">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
+    </nav>
+    <p class="sidebar-note"><strong>Administrator</strong><br>Static CRM sample</p>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <!-- The phone menu uses HTML details, so JavaScript is not needed. -->
+      <details class="mobile-menu">
+        <summary>☰ Menu</summary>
+        <nav aria-label="Phone navigation">
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}">Tickets</a>
+          <a href="{% url 'leads' %}" class="active">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
+        </nav>
+      </details>
+      <span>Workspace / New lead</span>
+      <div class="button-row">
+        <a href="{% url 'clientAccess' %}">Client portal</a>
+        <a href="{% url 'inquiry' %}">Public inquiry</a>
+      </div>
+    </header>
+    <main>
+      <div class="page-title">
+        <div>
+          <span class="eyebrow">CLIENTFLOW CRM</span>
+          <h1>New lead</h1>
+          <p>Add a potential customer to the sales pipeline.</p>
+        </div>
+
+      </div>
+      <a class="back-link" href="{% url 'leads' %}">← Back to leads</a>
+      <section class="card form-card">
+        <h2>Lead details</h2>
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% for error in form.non_field_errors %}
+            <p class="notice">{{ error }}</p>
+          {% endfor %}
+
+          <div class="form-columns">
+            <label>{{ form.company_name.label }}
+              {{ form.company_name }}
+              {% for error in form.company_name.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+            </label>
+            <label>{{ form.contact_name.label }}
+              {{ form.contact_name }}
+              {% for error in form.contact_name.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+            </label>
+          </div>
+          <label>{{ form.email.label }}
+            {{ form.email }}
+            {% for error in form.email.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+          </label>
+          <label>{{ form.description.label }}
+            {{ form.description }}
+            {% for error in form.description.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+          </label>
+          <div class="form-columns">
+            <label>{{ form.stage.label }}
+              {{ form.stage }}
+              {% for error in form.stage.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+            </label>
+            <label>{{ form.follow_up_date.label }}
+              {{ form.follow_up_date }}
+              {% for error in form.follow_up_date.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+            </label>
+          </div>
+          <div class="button-row">
+            <button class="button" type="submit">Save lead</button>
+            <a class="button secondary" href="{% url 'leads' %}">Cancel</a>
+          </div>
+        </form>
+      </section>
+      <footer>ClientFlow · Lead records</footer>
+    </main>
+  </div>
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

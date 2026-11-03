@@ -10,12 +10,12 @@
 <body>
   <!-- Shared navigation. All links open separate HTML pages. -->
   <aside class="sidebar">
-    <a class="brand" href={% url 'dashboard' %}>ClientFlow<span>.</span></a>
+    <a class="brand" href="{% url 'dashboard' %}">ClientFlow<span>.</span></a>
     <p class="eyebrow">WORKSPACE</p>
     <nav aria-label="Main navigation">
-          <a href={% url 'client' %}>My workspace</a>
-          <a href={% url 'newTicket' %}>New support ticket</a>
-          <a href={% url 'inquiry' %} class="active">Public inquiry</a>
+          <a href="{% url 'client' %}">My workspace</a>
+          <a href="{% url 'newTicket' %}">New support ticket</a>
+          <a href="{% url 'inquiry' %}" class="active">Public inquiry</a>
     </nav>
     <p class="sidebar-note"><strong>Client</strong><br>Static CRM sample</p>
   </aside>
@@ -25,15 +25,15 @@
       <details class="mobile-menu">
         <summary>☰ Menu</summary>
         <nav aria-label="Phone navigation">
-          <a href={% url 'client' %} class="active">My workspace</a>
-          <a href={% url 'newTicket' %}>New support ticket</a>
-          <a href={% url 'inquiry' %}>Public inquiry</a>
+          <a href="{% url 'client' %}">My workspace</a>
+          <a href="{% url 'newTicket' %}">New support ticket</a>
+          <a href="{% url 'inquiry' %}" class="active">Public inquiry</a>
         </nav>
       </details>
       <span>Workspace / Let’s start a conversation.</span>
       <div class="button-row">
-        <a href={% url 'dashboard' %}>Administrator view</a>
-        <a href={% url 'inquiry' %}>Public inquiry</a>
+        <a href="{% url 'dashboard' %}">Administrator view</a>
+        <a href="{% url 'inquiry' %}">Public inquiry</a>
       </div>
     </header>
     <main>
@@ -43,23 +43,48 @@
           <h1>Let’s start a conversation.</h1>
           <p>Tell us about your project or question.</p>
         </div>
-        
+
       </div>
-      <!-- Sample records are written directly below. Edit this HTML to change them. -->
       <section class="card form-card">
         <h2>How can we help?</h2>
-        <form class="demo-form">
-          <div class="form-columns"><label>Your name<input required type="text" name="name" placeholder="Your full name"></label><label>Email address<input required type="email" name="email" placeholder="you@example.com"></label></div>
-          <label>Phone number (optional)<input type="tel" name="phone" placeholder="+977 …"></label>
-          <label>Your message<textarea required name="message" placeholder="Tell us about your project…"></textarea></label>
-          <button class="button" type="submit">Preview inquiry</button>
-          <p class="form-note">This form does not send an inquiry. Entering an email does not provide access to customer records.</p>
-          <p class="notice" hidden tabindex="-1">This is a static form preview. No data was sent or saved.</p>
+
+        {% if messages %}
+          {% for message in messages %}
+            <p class="notice" tabindex="-1">{{ message }}</p>
+          {% endfor %}
+        {% endif %}
+
+        <!-- Submits to the inquiry view, which saves it as a Pending inquiry. -->
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+              <p class="notice">{{ error }}</p>
+            {% endfor %}
+          {% endif %}
+
+          <div class="form-columns">
+            <label>{{ form.sender_name.label }}
+              {{ form.sender_name }}
+              {% for error in form.sender_name.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+            </label>
+            <label>{{ form.email.label }}
+              {{ form.email }}
+              {% for error in form.email.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+            </label>
+          </div>
+          <label>Your message
+            {{ form.message }}
+            {% for error in form.message.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+          </label>
+          <button class="button" type="submit">Send inquiry</button>
+          <p class="form-note">New inquiries stay pending until they are reviewed. Entering an email does not provide access to customer records.</p>
         </form>
       </section>
-      <footer>ClientFlow · Static UI with dummy data · No backend</footer>
+      <footer>ClientFlow · Inquiry form</footer>
     </main>
   </div>
-  <script src="app.js"></script>
+  <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

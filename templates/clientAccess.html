@@ -10,11 +10,11 @@
 <body class="login-page">
   <main class="login-layout">
     <section class="login-intro">
-      <a class="brand" href={ url 'dashboard' %}>ClientFlow<span>.</span></a>
+      <a class="brand" href={% url 'dashboard' %}>ClientFlow<span>.</span></a>
       <span class="eyebrow">YOUR CLIENT PORTAL</span>
       <h1>Your projects.<br> Your conversations.<br> One place.</h1>
       <p>View your projects, follow support tickets, and keep every conversation connected.</p>
-      <a class="login-back" href={ url 'dashboard' %}>← Back to dashboard</a>
+      <a class="login-back" href={% url 'dashboard' %}>← Back to dashboard</a>
     </section>
     <section class="card login-card" aria-labelledby="access-title">
       <span class="eyebrow">WELCOME BACK</span>
@@ -41,6 +41,6 @@
       <p class="login-help">Have a question? <a href={% url 'inquiry' %}>Send an inquiry</a></p>
     </section>
   </main>
-  <script src="otp.js"></script>
+  <script src={% static 'otp.js' %}></script>
 </body>
 </html>

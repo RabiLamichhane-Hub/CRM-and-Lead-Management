@@ -6,20 +6,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sales pipeline | ClientFlow CRM</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    .lead[draggable="true"] { cursor: grab; }
+    .lead.dragging { opacity: .45; cursor: grabbing; }
+    .stage.drag-over { outline: 2px dashed #6b7cff; outline-offset: -2px; }
+  </style>
 </head>
 <body>
   <!-- Shared navigation. All links open separate HTML pages. -->
   <aside class="sidebar">
-    <a class="brand" href={% url 'dashboard' %}>ClientFlow<span>.</span></a>
+    <a class="brand" href="{% url 'dashboard' %}">ClientFlow<span>.</span></a>
     <p class="eyebrow">WORKSPACE</p>
     <nav aria-label="Main navigation">
-          <a href={% url 'dashboard' %}>Dashboard</a>
-          <a href={% url 'customer_list' %}>Customers</a>
-          <a href={% url 'projects' %}>Projects</a>
-          <a href={% url 'tickets' %}>Tickets</a>
-          <a href={% url 'leads' %} class="active">Leads</a>
-          <a href={% url 'inquiries' %}>Inquiries</a>
-          <a href={% url 'reports' %}>Reports</a>
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}">Tickets</a>
+          <a href="{% url 'leads' %}" class="active">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
     </nav>
     <p class="sidebar-note"><strong>Administrator</strong><br>Static CRM sample</p>
   </aside>
@@ -30,18 +35,18 @@
         <summary>☰ Menu</summary>
         <nav aria-label="Phone navigation">
           <a href="{% url 'dashboard' %}">Dashboard</a>
-          <a href={% url 'customer_list' %}>Customers</a>
-          <a href={% url 'projects' %}>Projects</a>
-          <a href={% url 'tickets' %}>Tickets</a>
-          <a href={% url 'leads' %} class="active">Leads</a>
-          <a href={% url 'inquiries' %}>Inquiries</a>
-          <a href={% url 'reports' %}>Reports</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}">Tickets</a>
+          <a href="{% url 'leads' %}" class="active">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
         </nav>
       </details>
       <span>Workspace / Sales pipeline</span>
       <div class="button-row">
-        <a href={% url 'clientAccess' %}>Client portal</a>
-        <a href={% url 'inquiry' %}>Public inquiry</a>
+        <a href="{% url 'clientAccess' %}">Client portal</a>
+        <a href="{% url 'inquiry' %}">Public inquiry</a>
       </div>
     </header>
     <main>
@@ -49,35 +54,138 @@
         <div>
           <span class="eyebrow">CLIENTFLOW CRM</span>
           <h1>Sales pipeline</h1>
-          <p>Sample leads grouped by their current stage.</p>
+          <p>Leads grouped by their current stage. Drag a lead to another stage to move it.</p>
         </div>
-        
+        <a class="button" href="{% url 'newLead' %}">+ New lead</a>
       </div>
-      <!-- Sample records are written directly below. Edit this HTML to change them. -->
+      {% for message in messages %}
+        <p class="notice" tabindex="-1">{{ message }}</p>
+      {% endfor %}
+      <!-- Records are rendered from the `stages` list passed by the leads view. -->
       <div class="pipeline">
-        <section class="stage"><h2>New</h2>
-          <article class="lead"><h3>Vista Health</h3><small>Sanjay Bista</small><p>Clinic website and inquiry forms</p><span class="badge gray">Oct 10</span></article>
-          <article class="lead"><h3>Peak Logistics</h3><small>Samir Adhikari</small><p>Business website</p><span class="badge gray">Oct 8 · Overdue</span></article>
+        {% for stage in stages %}
+        <section class="stage" data-stage="{{ stage.value }}"><h2>{{ stage.label }}</h2>
+          {% for l in stage.leads %}
+          <article class="lead" draggable="true" data-id="{{ l.pk }}" data-stage="{{ stage.value }}" data-url="{% url 'updateLeadStage' l.pk %}">
+            <h3>{{ l.company_name }}</h3>
+            <small>{{ l.contact_name }}</small>
+            <p>{{ l.description }}</p>
+            {% if l.converted_customer %}
+              <span class="badge gray">Converted to customer</span>
+            {% elif l.follow_up_date %}
+              <span class="badge gray">{{ l.follow_up_date|date:"M j" }}{% if l.overdue %}<span class="overdue-text"> · Overdue</span>{% endif %}</span>
+            {% endif %}
+          </article>
+          {% empty %}
+          <p class="muted empty-note">No leads</p>
+          {% endfor %}
         </section>
-        <section class="stage"><h2>Contacted</h2>
-          <article class="lead"><h3>Craft Collective</h3><small>Pooja Shah</small><p>Brand portfolio</p><span class="badge gray">Oct 12</span></article>
-        </section>
-        <section class="stage"><h2>Qualified</h2>
-          <article class="lead"><h3>Oakridge Realty</h3><small>Anita Lama</small><p>Property listing website</p><span class="badge gray">Oct 9</span></article>
-        </section>
-        <section class="stage"><h2>Proposal Sent</h2>
-          <article class="lead"><h3>Summit Hospitality</h3><small>Pratik Joshi</small><p>Hotel booking platform</p><span class="badge gray">Oct 9</span></article>
-        </section>
-        <section class="stage"><h2>Won</h2>
-          <article class="lead"><h3>Meridian Foods</h3><small>Bikash Rai</small><p>Company website</p><span class="badge gray">Converted to customer</span></article>
-        </section>
-        <section class="stage"><h2>Lost</h2>
-          <article class="lead"><h3>Urban Threads</h3><small>Kiran Nepal</small><p>Online store</p><span class="badge gray">Project deferred</span></article>
-        </section>
+        {% endfor %}
       </div>
-      <footer>ClientFlow · Static UI with dummy data · No backend</footer>
+      <footer>ClientFlow · Lead records</footer>
     </main>
   </div>
-  <script src="app.js"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+  <script>
+    (function () {
+      const csrfToken = "{{ csrf_token }}";
+      let dragged = null;
+      let fromParent = null;
+      let fromNext = null;
+
+      // Show "No leads" only in stages that are empty.
+      function refreshEmptyNotes() {
+        document.querySelectorAll('.stage').forEach(function (stage) {
+          const hasLeads = stage.querySelector('.lead') !== null;
+          const note = stage.querySelector('.empty-note');
+          if (hasLeads && note) {
+            note.remove();
+          } else if (!hasLeads && !note) {
+            const p = document.createElement('p');
+            p.className = 'muted empty-note';
+            p.textContent = 'No leads';
+            stage.appendChild(p);
+          }
+        });
+      }
+
+      document.querySelectorAll('.lead[draggable="true"]').forEach(function (card) {
+        card.addEventListener('dragstart', function (e) {
+          dragged = card;
+          fromParent = card.parentNode;
+          fromNext = card.nextSibling;
+          card.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', card.dataset.id);
+        });
+        card.addEventListener('dragend', function () {
+          card.classList.remove('dragging');
+          document.querySelectorAll('.stage.drag-over').forEach(function (s) {
+            s.classList.remove('drag-over');
+          });
+        });
+      });
+
+      document.querySelectorAll('.stage').forEach(function (stage) {
+        stage.addEventListener('dragover', function (e) {
+          if (!dragged) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          stage.classList.add('drag-over');
+        });
+
+        stage.addEventListener('dragleave', function (e) {
+          if (!stage.contains(e.relatedTarget)) {
+            stage.classList.remove('drag-over');
+          }
+        });
+
+        stage.addEventListener('drop', async function (e) {
+          e.preventDefault();
+          stage.classList.remove('drag-over');
+          if (!dragged) return;
+
+          const card = dragged;
+          const parent = fromParent;
+          const next = fromNext;
+          dragged = null;
+
+          const target = stage.dataset.stage;
+          if (!target) {
+            alert('This column has no stage value. Add "value" to each stage in the leads view.');
+            return;
+          }
+          if (card.dataset.stage === target) return;
+
+          // Move the card right away; undo it if the server says no.
+          stage.appendChild(card);
+          refreshEmptyNotes();
+
+          try {
+            const response = await fetch(card.dataset.url, {
+              method: 'POST',
+              headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              body: new URLSearchParams({ stage: target })
+            });
+            if (!response.ok) throw new Error('Request failed');
+
+            card.dataset.stage = target;
+            // Won and lost leads are never overdue.
+            if (target === 'won' || target === 'lost') {
+              const overdue = card.querySelector('.overdue-text');
+              if (overdue) overdue.remove();
+            }
+          } catch (err) {
+            parent.insertBefore(card, next);
+            refreshEmptyNotes();
+            alert('Could not move the lead. Please try again.');
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -10,16 +10,16 @@
 <body>
   <!-- Shared navigation. All links open separate HTML pages. -->
   <aside class="sidebar">
-    <a class="brand" href={% url 'dashboard' %}>ClientFlow<span>.</span></a>
+    <a class="brand" href="{% url 'dashboard' %}">ClientFlow<span>.</span></a>
     <p class="eyebrow">WORKSPACE</p>
     <nav aria-label="Main navigation">
-          <a href={% url 'dashboard' %} class="active">Dashboard</a>
-          <a href={% url 'customer_list' %}>Customers</a>
-          <a href={% url 'projects' %}>Projects</a>
-          <a href={% url 'tickets' %}>Tickets</a>
-          <a href={% url 'leads' %}>Leads</a>
-          <a href={% url 'inquiries' %}>Inquiries</a>
-          <a href={% url 'reports' %}>Reports</a>
+          <a href="{% url 'dashboard' %}" class="active">Dashboard</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}">Tickets</a>
+          <a href="{% url 'leads' %}">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
     </nav>
     <p class="sidebar-note"><strong>Administrator</strong><br>Static CRM sample</p>
   </aside>
@@ -29,19 +29,19 @@
       <details class="mobile-menu">
         <summary>☰ Menu</summary>
         <nav aria-label="Phone navigation">
-          <a href={% url 'dashboard' %} class="active">Dashboard</a>
-          <a href={% url 'customer_list' %}>Customers</a>
-          <a href={% url 'projects' %}>Projects</a>
-          <a href={% url 'tickets' %}>Tickets</a>
-          <a href={% url 'leads' %}>Leads</a>
-          <a href={% url 'inquiries' %}>Inquiries</a>
-          <a href={% url 'reports' %}>Reports</a>
+          <a href="{% url 'dashboard' %}" class="active">Dashboard</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}">Tickets</a>
+          <a href="{% url 'leads' %}">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
         </nav>
       </details>
       <span>Workspace / A good day to build connections.</span>
       <div class="button-row">
-        <a href={% url 'clientAccess' %}>Client portal</a>
-        <a href={% url 'inquiry' %}>Public inquiry</a>
+        <a href="{% url 'clientAccess' %}">Client portal</a>
+        <a href="{% url 'inquiry' %}">Public inquiry</a>
       </div>
     </header>
     <main>
@@ -51,47 +51,60 @@
           <h1>A good day to build connections.</h1>
           <p>An overview of your customers, projects, and conversations.</p>
         </div>
-        <a class="button" href={% url 'newCustomer' %}>+ New customer</a>
+        <a class="button" href="{% url 'newCustomer' %}">+ New customer</a>
       </div>
-      <!-- Sample records are written directly below. Edit this HTML to change them. -->
+      <!-- Values are calculated in the dashboard view. -->
       <div class="stats">
-        <section class="stat"><span class="muted">Total customers</span><strong>6</strong><small>Connected customer accounts</small></section>
-        <section class="stat"><span class="muted">Active tickets</span><strong>4</strong><small>1 reopened issue</small></section>
-        <section class="stat"><span class="muted">Active leads</span><strong>5</strong><small>Across the sales pipeline</small></section>
-        <section class="stat"><span class="muted">Follow-ups due</span><strong>3</strong><small>Today and overdue</small></section>
+        <section class="stat"><span class="muted">Total customers</span><strong>{{ customer_count }}</strong><small>Connected customer accounts</small></section>
+        <section class="stat"><span class="muted">Active tickets</span><strong>{{ active_ticket_count }}</strong><small>{{ reopened_count }} reopened issue{{ reopened_count|pluralize }}</small></section>
+        <section class="stat"><span class="muted">Active leads</span><strong>{{ active_lead_count }}</strong><small>Across the sales pipeline</small></section>
+        <section class="stat"><span class="muted">Follow-ups due</span><strong>{{ followups_due_count }}</strong><small>Today and overdue</small></section>
       </div>
       <section class="banner">
-        <div><h2>4 active tickets. Keep every conversation moving.</h2><p>Review customer issues and plan the next step.</p></div>
-        <a class="button secondary" href={% url 'tickets'%}>View tickets →</a>
+        <div><h2>{{ active_ticket_count }} active ticket{{ active_ticket_count|pluralize }}. Keep every conversation moving.</h2><p>Review customer issues and plan the next step.</p></div>
+        <a class="button secondary" href="{% url 'tickets' %}">View tickets →</a>
       </section>
       <div class="grid">
         <section class="card">
-          <div class="card-heading"><h2>Recent tickets</h2><a href={% url 'tickets' %}>View all →</a></div>
+          <div class="card-heading"><h2>Recent tickets</h2><a href="{% url 'tickets' %}">View all →</a></div>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Ticket</th><th>Customer</th><th>Status</th><th>Priority</th><th>Created</th></tr></thead>
           <tbody>
+            {% for t in recent_tickets %}
             <tr>
-              <td data-label="Ticket"><a href={% url 'ticketDetail'%}>Checkout confirmation email not received</a><small>#1042</small></td>
-              <td data-label="Customer">Everest Digital</td>
-              <td data-label="Status"><span class="badge blue">Open</span></td>
-              <td data-label="Priority"><span class="badge red">High</span></td>
-              <td data-label="Created">Oct 9</td>
+              <td data-label="Ticket">
+                <a href="{% url 'ticketDetail' t.pk %}">{{ t.title }}</a>
+                <small>#{{ t.pk }}</small>
+              </td>
+              <td data-label="Customer">{{ t.customer.company_name }}</td>
+              <td data-label="Status">
+                {% if t.status == "open" or t.status == "reopened" %}
+                  <span class="badge blue">{{ t.get_status_display }}</span>
+                {% elif t.status == "in_progress" or t.status == "awaiting_response" %}
+                  <span class="badge amber">{{ t.get_status_display }}</span>
+                {% elif t.status == "resolved" %}
+                  <span class="badge ">{{ t.get_status_display }}</span>
+                {% else %}
+                  <span class="badge gray">{{ t.get_status_display }}</span>
+                {% endif %}
+              </td>
+              <td data-label="Priority">
+                {% if t.priority == "high" %}
+                  <span class="badge red">{{ t.get_priority_display }}</span>
+                {% elif t.priority == "medium" %}
+                  <span class="badge amber">{{ t.get_priority_display }}</span>
+                {% else %}
+                  <span class="badge gray">{{ t.get_priority_display }}</span>
+                {% endif %}
+              </td>
+              <td data-label="Created">{{ t.created_at|date:"M j" }}</td>
             </tr>
+            {% empty %}
             <tr>
-              <td data-label="Ticket"><strong>Update the seasonal booking calendar</strong><small>#1041</small></td>
-              <td data-label="Customer">Himalayan Ventures</td>
-              <td data-label="Status"><span class="badge amber">In Progress</span></td>
-              <td data-label="Priority"><span class="badge amber">Medium</span></td>
-              <td data-label="Created">Oct 8</td>
+              <td colspan="5">No support tickets yet.</td>
             </tr>
-            <tr>
-              <td data-label="Ticket"><strong>Mobile product images appear cropped</strong><small>#1040</small></td>
-              <td data-label="Customer">Everest Digital</td>
-              <td data-label="Status"><span class="badge amber">Awaiting Client Response</span></td>
-              <td data-label="Priority"><span class="badge amber">Medium</span></td>
-              <td data-label="Created">Oct 7</td>
-            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
@@ -99,16 +112,37 @@
         <div class="stack">
           <section class="card">
             <h2>Upcoming follow-ups</h2>
-            <div class="list-item"><strong>Peak Logistics</strong><p>First contact · Oct 8</p><span class="badge red">Overdue</span></div>
-            <div class="list-item"><strong>Summit Hospitality</strong><p>Discuss proposal · Oct 9</p><span class="badge amber">Today</span></div>
-            <div class="list-item"><strong>Oakridge Realty</strong><p>Confirm requirements · Oct 9</p><span class="badge amber">Today</span></div>
+            {% for l in followups %}
+            <div class="list-item">
+              <strong>{{ l.company_name }}</strong>
+              <p>{{ l.get_stage_display }} · {{ l.follow_up_date|date:"M j" }}</p>
+              {% if l.is_overdue %}
+                <span class="badge red">Overdue</span>
+              {% elif l.is_today %}
+                <span class="badge amber">Today</span>
+              {% endif %}
+            </div>
+            {% empty %}
+            <p class="muted">No follow-ups scheduled.</p>
+            {% endfor %}
           </section>
-          <section class="card"><h2>Recent activity</h2><p>Northstar Studio reopened ticket #1039.</p><p class="muted">A new inquiry arrived from Sabina KC.</p></section>
+          <section class="card">
+            <h2>Recent activity</h2>
+            {% if latest_reopened %}
+              <p>{{ latest_reopened.customer.company_name }} reopened ticket #{{ latest_reopened.pk }}.</p>
+            {% endif %}
+            {% if latest_inquiry %}
+              <p class="muted">A new inquiry arrived from {{ latest_inquiry.sender_name }}.</p>
+            {% endif %}
+            {% if not latest_reopened and not latest_inquiry %}
+              <p class="muted">No recent activity.</p>
+            {% endif %}
+          </section>
         </div>
       </div>
-      <footer>ClientFlow · Static UI with dummy data · No backend</footer>
+      <footer>ClientFlow · Overview of live records</footer>
     </main>
   </div>
-  <script src="app.js"></script>
+  <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

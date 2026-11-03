@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if project %}Edit project{% else %}New project{% endif %} | ClientFlow CRM</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <!-- Shared navigation. All links open separate HTML pages. -->
+  <aside class="sidebar">
+    <a class="brand" href="{% url 'dashboard' %}">ClientFlow<span>.</span></a>
+    <p class="eyebrow">WORKSPACE</p>
+    <nav aria-label="Main navigation">
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}" class="active">Projects</a>
+          <a href="{% url 'tickets' %}">Tickets</a>
+          <a href="{% url 'leads' %}">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
+    </nav>
+    <p class="sidebar-note"><strong>Administrator</strong><br>Static CRM sample</p>
+  </aside>
+  <div class="page">
+    <header class="topbar">
+      <!-- The phone menu uses HTML details, so JavaScript is not needed. -->
+      <details class="mobile-menu">
+        <summary>☰ Menu</summary>
+        <nav aria-label="Phone navigation">
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}" class="active">Projects</a>
+          <a href="{% url 'tickets' %}">Tickets</a>
+          <a href="{% url 'leads' %}">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
+        </nav>
+      </details>
+      <span>Workspace / {% if project %}Edit project{% else %}New project{% endif %}</span>
+      <div class="button-row">
+        <a href="{% url 'clientAccess' %}">Client portal</a>
+        <a href="{% url 'inquiry' %}">Public inquiry</a>
+      </div>
+    </header>
+    <main>
+      <div class="page-title">
+        <div>
+          <span class="eyebrow">CLIENTFLOW CRM</span>
+          <h1>{% if project %}Edit project{% else %}New project{% endif %}</h1>
+          <p>{% if project %}Update the details of {{ project.name }}.{% else %}Create a project for one of your customers.{% endif %}</p>
+        </div>
+
+      </div>
+      <a class="back-link" href="{% url 'projects' %}">← Back to projects</a>
+      <section class="card form-card">
+        <h2>Project details</h2>
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% for error in form.non_field_errors %}
+            <p class="notice">{{ error }}</p>
+          {% endfor %}
+
+          <div class="form-columns">
+            <label>{{ form.customer.label }}
+              {{ form.customer }}
+              {% for error in form.customer.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+            </label>
+            <label>{{ form.name.label }}
+              {{ form.name }}
+              {% for error in form.name.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+            </label>
+          </div>
+          <label>{{ form.description.label }}
+            {{ form.description }}
+            {% for error in form.description.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+          </label>
+          <div class="form-columns">
+            <label>{{ form.status.label }}
+              {{ form.status }}
+              {% for error in form.status.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+            </label>
+            <label>{{ form.progress.label }}
+              {{ form.progress }}
+              {% for error in form.progress.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+            </label>
+          </div>
+          <div class="form-columns">
+            <label>{{ form.start_date.label }}
+              {{ form.start_date }}
+              {% for error in form.start_date.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+            </label>
+            <label>{{ form.due_date.label }}
+              {{ form.due_date }}
+              {% for error in form.due_date.errors %}<small class="form-note">{{ error }}</small>{% endfor %}
+            </label>
+          </div>
+          <div class="button-row">
+            <button class="button" type="submit">{% if project %}Save changes{% else %}Save project{% endif %}</button>
+            <a class="button secondary" href="{% url 'projects' %}">Cancel</a>
+          </div>
+        </form>
+      </section>
+      <footer>ClientFlow · Project records</footer>
+    </main>
+  </div>
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

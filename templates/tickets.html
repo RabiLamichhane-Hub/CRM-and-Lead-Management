@@ -10,16 +10,16 @@
 <body>
   <!-- Shared navigation. All links open separate HTML pages. -->
   <aside class="sidebar">
-    <a class="brand" href={% url 'dashboard' %}>ClientFlow<span>.</span></a>
+    <a class="brand" href="{% url 'dashboard' %}">ClientFlow<span>.</span></a>
     <p class="eyebrow">WORKSPACE</p>
     <nav aria-label="Main navigation">
-          <a href={% url 'dashboard' %}>Dashboard</a>
-          <a href={% url 'customer_list' %}>Customers</a>
-          <a href={% url 'projects' %}>Projects</a>
-          <a href={% url 'tickets' %} class="active">Tickets</a>
-          <a href={% url 'leads' %}>Leads</a>
-          <a href={% url 'inquiries' %}>Inquiries</a>
-          <a href={% url 'reports' %}>Reports</a>
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}" class="active">Tickets</a>
+          <a href="{% url 'leads' %}">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
     </nav>
     <p class="sidebar-note"><strong>Administrator</strong><br>Static CRM sample</p>
   </aside>
@@ -30,18 +30,18 @@
         <summary>☰ Menu</summary>
         <nav aria-label="Phone navigation">
           <a href="{% url 'dashboard' %}">Dashboard</a>
-          <a href={% url 'customer_list' %}>Customers</a>
-          <a href={% url 'projects' %}>Projects</a>
-          <a href={% url 'tickets' %} class="active">Tickets</a>
-          <a href={% url 'leads' %}>Leads</a>
-          <a href={% url 'inquiries' %}>Inquiries</a>
-          <a href={% url 'reports' %}>Reports</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}" class="active">Tickets</a>
+          <a href="{% url 'leads' %}">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
         </nav>
       </details>
       <span>Workspace / Support tickets</span>
       <div class="button-row">
-        <a href={% url 'clientAccess' %}>Client portal</a>
-        <a href={% url 'inquiry' %}>Public inquiry</a>
+        <a href="{% url 'clientAccess' %}">Client portal</a>
+        <a href="{% url 'inquiry' %}">Public inquiry</a>
       </div>
     </header>
     <main>
@@ -51,63 +51,55 @@
           <h1>Support tickets</h1>
           <p>Review customer requests, status, and priority.</p>
         </div>
-        <a class="button" href={% url 'newTicket'%}>+ New ticket</a>
+        <a class="button" href="{% url 'newTicket' %}">+ New ticket</a>
       </div>
-      <!-- Sample records are written directly below. Edit this HTML to change them. -->
+      <!-- Records are rendered from the `ticket_list` queryset passed by the tickets view. -->
       <section class="card">
       <div class="table-wrap">
         <table>
           <thead><tr><th>Ticket</th><th>Customer</th><th>Status</th><th>Priority</th><th>Created</th></tr></thead>
           <tbody>
+            {% for t in ticket_list %}
             <tr>
-              <td data-label="Ticket"><a href={% url 'ticketDetail'%}>Checkout confirmation email not received</a><small>#1042</small></td>
-              <td data-label="Customer">Everest Digital</td>
-              <td data-label="Status"><span class="badge blue">Open</span></td>
-              <td data-label="Priority"><span class="badge red">High</span></td>
-              <td data-label="Created">Oct 9</td>
+              <td data-label="Ticket">
+                <a href="{% url 'ticketDetail' t.pk %}">{{ t.title }}</a>
+                <small>#{{ t.pk }}</small>
+              </td>
+              <td data-label="Customer">{{ t.customer.company_name }}</td>
+              <td data-label="Status">
+                {% if t.status == "open" or t.status == "reopened" %}
+                  <span class="badge blue">{{ t.get_status_display }}</span>
+                {% elif t.status == "in_progress" or t.status == "awaiting_response" %}
+                  <span class="badge amber">{{ t.get_status_display }}</span>
+                {% elif t.status == "resolved" %}
+                  <span class="badge ">{{ t.get_status_display }}</span>
+                {% else %}
+                  <span class="badge gray">{{ t.get_status_display }}</span>
+                {% endif %}
+              </td>
+              <td data-label="Priority">
+                {% if t.priority == "high" %}
+                  <span class="badge red">{{ t.get_priority_display }}</span>
+                {% elif t.priority == "medium" %}
+                  <span class="badge amber">{{ t.get_priority_display }}</span>
+                {% else %}
+                  <span class="badge gray">{{ t.get_priority_display }}</span>
+                {% endif %}
+              </td>
+              <td data-label="Created">{{ t.created_at|date:"M j" }}</td>
             </tr>
+            {% empty %}
             <tr>
-              <td data-label="Ticket"><strong>Update the seasonal booking calendar</strong><small>#1041</small></td>
-              <td data-label="Customer">Himalayan Ventures</td>
-              <td data-label="Status"><span class="badge amber">In Progress</span></td>
-              <td data-label="Priority"><span class="badge amber">Medium</span></td>
-              <td data-label="Created">Oct 8</td>
+              <td colspan="5">No support tickets yet.</td>
             </tr>
-            <tr>
-              <td data-label="Ticket"><strong>Mobile product images appear cropped</strong><small>#1040</small></td>
-              <td data-label="Customer">Everest Digital</td>
-              <td data-label="Status"><span class="badge amber">Awaiting Client Response</span></td>
-              <td data-label="Priority"><span class="badge amber">Medium</span></td>
-              <td data-label="Created">Oct 7</td>
-            </tr>
-            <tr>
-              <td data-label="Ticket"><strong>Contact form sends duplicate inquiries</strong><small>#1039</small></td>
-              <td data-label="Customer">Northstar Studio</td>
-              <td data-label="Status"><span class="badge blue">Open · Reopened</span></td>
-              <td data-label="Priority"><span class="badge red">High</span></td>
-              <td data-label="Created">Oct 6</td>
-            </tr>
-            <tr>
-              <td data-label="Ticket"><strong>Add a booking confirmation link</strong><small>#1038</small></td>
-              <td data-label="Customer">Himalayan Ventures</td>
-              <td data-label="Status"><span class="badge ">Resolved</span></td>
-              <td data-label="Priority"><span class="badge gray">Low</span></td>
-              <td data-label="Created">Oct 4</td>
-            </tr>
-            <tr>
-              <td data-label="Ticket"><strong>Update footer contact details</strong><small>#1037</small></td>
-              <td data-label="Customer">Everest Digital</td>
-              <td data-label="Status"><span class="badge gray">Closed</span></td>
-              <td data-label="Priority"><span class="badge gray">Low</span></td>
-              <td data-label="Created">Oct 3</td>
-            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
       </section>
-      <footer>ClientFlow · Static UI with dummy data · No backend</footer>
+      <footer>ClientFlow · Support ticket records</footer>
     </main>
   </div>
-  <script src="app.js"></script>
+  <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

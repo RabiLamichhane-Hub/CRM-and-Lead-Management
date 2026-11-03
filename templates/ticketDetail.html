@@ -4,22 +4,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout confirmation email not received | ClientFlow CRM</title>
+  <title>{{ ticket.title }} | ClientFlow CRM</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
   <!-- Shared navigation. All links open separate HTML pages. -->
   <aside class="sidebar">
-    <a class="brand" href={% url 'dashboard' %}>ClientFlow<span>.</span></a>
+    <a class="brand" href="{% url 'dashboard' %}">ClientFlow<span>.</span></a>
     <p class="eyebrow">WORKSPACE</p>
     <nav aria-label="Main navigation">
           <a href="{% url 'dashboard' %}">Dashboard</a>
-          <a href={% url 'customer_list' %}>Customers</a>
-          <a href={% url 'projects' %}>Projects</a>
-          <a href={% url 'tickets' %} class="active">Tickets</a>
-          <a href={% url 'leads' %}>Leads</a>
-          <a href={% url 'inquiries' %}>Inquiries</a>
-          <a href={% url 'reports' %}>Reports</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}" class="active">Tickets</a>
+          <a href="{% url 'leads' %}">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
     </nav>
     <p class="sidebar-note"><strong>Administrator</strong><br>Static CRM sample</p>
   </aside>
@@ -30,37 +30,39 @@
         <summary>☰ Menu</summary>
         <nav aria-label="Phone navigation">
           <a href="{% url 'dashboard' %}">Dashboard</a>
-          <a href={% url 'customer_list' %}>Customers</a>
-          <a href={% url 'projects' %}>Projects</a>
-          <a href={% url 'tickets' %} class="active">Tickets</a>
-          <a href={% url 'leads' %}>Leads</a>
-          <a href={% url 'inquiries' %}>Inquiries</a>
-          <a href={% url 'reports' %}>Reports</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}" class="active">Tickets</a>
+          <a href="{% url 'leads' %}">Leads</a>
+          <a href="{% url 'inquiries' %}">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
         </nav>
       </details>
-      <span>Workspace / Checkout confirmation email not received</span>
+      <span>Workspace / {{ ticket.title }}</span>
       <div class="button-row">
-        <a href={% url 'clientAccess' %}>Client portal</a>
-        <a href={% url 'inquiry' %}>Public inquiry</a>
+        <a href="{% url 'clientAccess' %}">Client portal</a>
+        <a href="{% url 'inquiry' %}">Public inquiry</a>
       </div>
     </header>
     <main>
       <div class="page-title">
         <div>
           <span class="eyebrow">CLIENTFLOW CRM</span>
-          <h1>Checkout confirmation email not received</h1>
-          <p>Ticket #1042 · Everest Digital · E-commerce platform</p>
+          <h1>{{ ticket.title }}</h1>
+          <p>Ticket #{{ ticket.pk }} · {{ ticket.customer.company_name }}{% if ticket.project %} · {{ ticket.project.name }}{% endif %}</p>
         </div>
-        
+
       </div>
-      <!-- Sample records are written directly below. Edit this HTML to change them. -->
-      <a class="back-link" href={% url 'tickets' %}>← Back to tickets</a>
+      <!-- Record is rendered from the `ticket` object passed by ticketDetail. -->
+      <a class="back-link" href="{% url 'tickets' %}">← Back to tickets</a>
       <div class="grid">
         <section class="card">
           <h2>Conversation</h2>
-          <article class="message"><strong>Aarav Sharma</strong><small>October 9, 9:15 AM</small><p>The confirmation email is missing after checkout. Please check the email settings.</p></article>
-          <article class="message"><strong>Administrator</strong><small>October 9, 10:00 AM</small><p>We have received your request and will review the confirmation email settings.</p></article>
-          <article class="internal"><strong>Internal note</strong><p>Review the mail service configuration before the next update.</p></article>
+          <article class="message">
+            <strong>{{ ticket.customer.contact_name }}</strong>
+            <small>{{ ticket.created_at|date:"F j, g:i A" }}</small>
+            <p>{% if ticket.description %}{{ ticket.description|linebreaksbr }}{% else %}No description provided.{% endif %}</p>
+          </article>
 
           <form class="demo-form reply-form">
             <label>Your reply<textarea required placeholder="Write a reply…"></textarea></label>
@@ -72,13 +74,52 @@
           </form>
         </section>
         <div class="stack">
-          <section class="card"><h2>Ticket details</h2><dl class="details"><div><dt>Ticket</dt><dd>#1042</dd></div><div><dt>Status</dt><dd><span class="badge blue">Open</span></dd></div><div><dt>Priority</dt><dd><span class="badge red">High</span></dd></div><div><dt>Customer</dt><dd>Everest Digital</dd></div><div><dt>Project</dt><dd>E-commerce platform</dd></div></dl></section>
-          <section class="card"><h2>Status history</h2><div class="list-item"><strong>Open</strong><p>Client submitted the ticket · Oct 9</p></div></section>
+          <section class="card">
+            <h2>Ticket details</h2>
+            <dl class="details">
+              <div><dt>Ticket</dt><dd>#{{ ticket.pk }}</dd></div>
+              <div>
+                <dt>Status</dt>
+                <dd>
+                  {% if ticket.status == "open" or ticket.status == "reopened" %}
+                    <span class="badge blue">{{ ticket.get_status_display }}</span>
+                  {% elif ticket.status == "in_progress" or ticket.status == "awaiting_response" %}
+                    <span class="badge amber">{{ ticket.get_status_display }}</span>
+                  {% elif ticket.status == "resolved" %}
+                    <span class="badge ">{{ ticket.get_status_display }}</span>
+                  {% else %}
+                    <span class="badge gray">{{ ticket.get_status_display }}</span>
+                  {% endif %}
+                </dd>
+              </div>
+              <div>
+                <dt>Priority</dt>
+                <dd>
+                  {% if ticket.priority == "high" %}
+                    <span class="badge red">{{ ticket.get_priority_display }}</span>
+                  {% elif ticket.priority == "medium" %}
+                    <span class="badge amber">{{ ticket.get_priority_display }}</span>
+                  {% else %}
+                    <span class="badge gray">{{ ticket.get_priority_display }}</span>
+                  {% endif %}
+                </dd>
+              </div>
+              <div><dt>Customer</dt><dd>{{ ticket.customer.company_name }}</dd></div>
+              <div><dt>Project</dt><dd>{% if ticket.project %}{{ ticket.project.name }}{% else %}None{% endif %}</dd></div>
+            </dl>
+          </section>
+          <section class="card">
+            <h2>Status history</h2>
+            <div class="list-item"><strong>Created</strong><p>Client submitted the ticket · {{ ticket.created_at|date:"M j" }}</p></div>
+            {% if ticket.resolved_at %}
+            <div class="list-item"><strong>Resolved</strong><p>Ticket marked as resolved · {{ ticket.resolved_at|date:"M j" }}</p></div>
+            {% endif %}
+          </section>
         </div>
       </div>
-      <footer>ClientFlow · Static UI with dummy data · No backend</footer>
+      <footer>ClientFlow · Support ticket records</footer>
     </main>
   </div>
-  <script src="app.js"></script>
+  <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

@@ -6,20 +6,122 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inquiries | ClientFlow CRM</title>
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+
+    /* Review cell: status badge on top, one-tap status buttons below. */
+    .review-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-bottom: 8px; }
+    .review-head small { margin: 0; opacity: .7; }
+    .review-form { display: flex; flex-direction: column; align-items: stretch; gap: 8px; margin: 0; max-width: 260px; }
+    .review-select {
+      width: 100%;
+      min-width: 0;
+      min-height: 40px;
+      padding: 0 30px 0 10px;
+      font: inherit;
+      font-size: .72rem;
+      line-height: 1.2;
+      text-overflow: clip;
+      color: inherit;
+      border: 1px solid #d5dbd5;
+      border-radius: 10px;
+      background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23244a36' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>") no-repeat right 12px center / 12px 8px;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+    .review-select:focus-visible { outline: 2px solid #244a36; outline-offset: 2px; }
+    .review-save {
+      min-height: 40px;
+      padding: 0 16px;
+      font: inherit;
+      font-size: .9rem;
+      font-weight: 600;
+      color: #fff;
+      background: #244a36;
+      border: 0;
+      border-radius: 10px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .review-save { width: 100%; }
+    .review-save:hover:not(:disabled) { background: #1c3a2a; }
+    .review-save:disabled { opacity: .4; cursor: not-allowed; }
+
+    @media (min-width: 721px) {
+      /* Keep the Review column wide enough for the full status text. */
+      td[data-label="Review"] { min-width: 180px; }
+      .review-form { max-width: 200px; }
+      .review-select { min-height: 42px; padding-right: 34px; }
+      .review-save { min-height: 42px; }
+    }
+
+    @media (max-width: 720px) {
+      /* Filters become a tidy 2-column grid of large tap targets. */
+      .filter-bar { display: grid; grid-template-columns: 1fr 1fr; }
+      .filter-bar .button { justify-content: center; text-align: center; min-height: 44px; }
+
+      /* Each row is one column, and each cell takes the full card width. */
+      tbody tr {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 0 !important;
+      }
+      tbody tr td[data-label] {
+        grid-column: 1 / -1 !important;
+        display: block !important;
+        grid-template-columns: none !important;
+        width: auto !important;
+        text-align: left !important;
+        padding: 6px 0 !important;
+      }
+
+      /* Sender, message and review are self-explanatory, so their labels are hidden. */
+      td[data-label="Sender"]::before,
+      td[data-label="Message"]::before,
+      td[data-label="Review"]::before { display: none !important; }
+
+      /* Order: sender, date, message, review. */
+      td[data-label="Sender"]    { order: 1; }
+      td[data-label="Submitted"] { order: 2; padding-top: 0 !important; }
+      td[data-label="Message"]   { order: 3; line-height: 1.5; overflow-wrap: anywhere; }
+      td[data-label="Review"]    { order: 4; margin-top: 8px; padding-top: 14px !important; border-top: 1px solid #e6eae6; }
+
+      /* The date stays small: label and value sit side by side on one line. */
+      td[data-label="Submitted"] {
+        display: flex !important;
+        align-items: baseline;
+        gap: 6px;
+        font-size: .85rem;
+        opacity: .8;
+      }
+      td[data-label="Submitted"]::before {
+        flex: none !important;
+        width: auto !important;
+        min-width: 0 !important;
+      }
+
+      /* Select and Update sit on one row with big tap targets. */
+      .review-select, .review-save { min-height: 44px; }
+      .review-select { font-size: 12px; }
+      .review-save { font-size: 15px; }
+      .review-form { max-width: none; }
+    }
+  </style>
 </head>
 <body>
   <!-- Shared navigation. All links open separate HTML pages. -->
   <aside class="sidebar">
-    <a class="brand" href={% url 'dashboard' %}>ClientFlow<span>.</span></a>
+    <a class="brand" href="{% url 'dashboard' %}">ClientFlow<span>.</span></a>
     <p class="eyebrow">WORKSPACE</p>
     <nav aria-label="Main navigation">
-          <a href={% url 'dashboard' %}>Dashboard</a>
-          <a href={% url 'customer_list' %} >Customers</a>
-          <a href={% url 'projects' %}>Projects</a>
-          <a href={% url 'tickets' %}>Tickets</a>
-          <a href={% url 'leads' %}>Leads</a>
-          <a href={% url 'inquiries' %} class="active">Inquiries</a>
-          <a href={% url 'reports' %}>Reports</a>
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}">Tickets</a>
+          <a href="{% url 'leads' %}">Leads</a>
+          <a href="{% url 'inquiries' %}" class="active">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
     </nav>
     <p class="sidebar-note"><strong>Administrator</strong><br>Static CRM sample</p>
   </aside>
@@ -30,18 +132,18 @@
         <summary>☰ Menu</summary>
         <nav aria-label="Phone navigation">
           <a href="{% url 'dashboard' %}">Dashboard</a>
-          <a href={% url 'customer_list' %}>Customers</a>
-          <a href={% url 'projects' %}>Projects</a>
-          <a href={% url 'tickets' %}>Tickets</a>
-          <a href={% url 'leads' %}>Leads</a>
-          <a href={% url 'inquiries' %} class="active">Inquiries</a>
-          <a href={% url 'reports' %}>Reports</a>
+          <a href="{% url 'customer_list' %}">Customers</a>
+          <a href="{% url 'projects' %}">Projects</a>
+          <a href="{% url 'tickets' %}">Tickets</a>
+          <a href="{% url 'leads' %}">Leads</a>
+          <a href="{% url 'inquiries' %}" class="active">Inquiries</a>
+          <a href="{% url 'reports' %}">Reports</a>
         </nav>
       </details>
       <span>Workspace / Inquiries</span>
       <div class="button-row">
-        <a href={% url 'clientAccess' %}>Client portal</a>
-        <a href={% url 'inquiry' %}>Public inquiry</a>
+        <a href="{% url 'clientAccess' %}">Client portal</a>
+        <a href="{% url 'inquiry' %}">Public inquiry</a>
       </div>
     </header>
     <main>
@@ -51,40 +153,75 @@
           <h1>Inquiries</h1>
           <p>New inquiries remain unverified until they are reviewed.</p>
         </div>
-        <a class="button secondary" href={% url 'inquiry' %}>Open public form</a>
+        <a class="button secondary" href="{% url 'inquiry' %}">Open public form</a>
       </div>
-      <!-- Sample records are written directly below. Edit this HTML to change them. -->
+      {% for message in messages %}
+        <p class="notice" tabindex="-1">{{ message }}</p>
+      {% endfor %}
+      <div class="filter-bar" role="group" aria-label="Filter inquiries by review status">
+        {% for f in filters %}
+          <a class="button{% if not f.active %} secondary{% endif %}"
+             href="{% url 'inquiries' %}{% if f.value %}?status={{ f.value }}{% endif %}"
+             {% if f.active %}aria-current="true"{% endif %}>{{ f.label }} ({{ f.count }})</a>
+        {% endfor %}
+      </div>
+      <!-- Records are rendered from the `inquiry_list` queryset passed by the inquiries view. -->
       <section class="card">
       <div class="table-wrap">
         <table>
           <thead><tr><th>Sender</th><th>Message</th><th>Submitted</th><th>Review</th></tr></thead>
           <tbody>
+            {% for i in inquiry_list %}
             <tr>
-              <td data-label="Sender"><strong>Sabina KC</strong><small>sabina@terrace.example</small></td>
-              <td data-label="Message">We are looking for a website for our café. Can we discuss the scope?</td>
-              <td data-label="Submitted">Oct 9</td>
-              <td data-label="Review"><span class="badge amber">Pending</span></td>
+              <td data-label="Sender"><strong>{{ i.sender_name }}</strong><small>{{ i.email }}</small></td>
+              <td data-label="Message">{{ i.message }}</td>
+              <td data-label="Submitted">{{ i.submitted_at|date:"M j" }}</td>
+              <td data-label="Review">
+                <div class="review-head">
+                  {% if i.review_status == "pending" %}
+                    <span class="badge amber">{{ i.get_review_status_display }}</span>
+                  {% elif i.review_status == "approved" %}
+                    <span class="badge ">{{ i.get_review_status_display }}</span>
+                  {% else %}
+                    <span class="badge gray">{{ i.get_review_status_display }}</span>
+                  {% endif %}
+                  {% if i.reviewed_at %}<small>Reviewed {{ i.reviewed_at|date:"M j" }}</small>{% endif %}
+                </div>
+                <form method="post" action="{% url 'updateInquiryStatus' i.pk %}" class="review-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="next" value="{{ current_url }}">
+                  <select name="review_status" class="review-select" data-initial="{{ i.review_status }}" aria-label="Review status for {{ i.sender_name }}">
+                    {% for value, label in review_choices %}
+                      <option value="{{ value }}"{% if value == i.review_status %} selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                  <button class="review-save" type="submit" disabled>Update</button>
+                </form>
+              </td>
             </tr>
+            {% empty %}
             <tr>
-              <td data-label="Sender"><strong>Aarav Sharma</strong><small>aarav@everest.example</small></td>
-              <td data-label="Message">Can we discuss a maintenance plan for our existing store?</td>
-              <td data-label="Submitted">Oct 8</td>
-              <td data-label="Review"><span class="badge amber">Pending</span></td>
+              <td colspan="4">{% if current_status %}No inquiries with this status.{% else %}No inquiries yet.{% endif %}</td>
             </tr>
-            <tr>
-              <td data-label="Sender"><strong>Deepak Poudel</strong><small>deepak@river.example</small></td>
-              <td data-label="Message">We need an online catalog for our furniture business.</td>
-              <td data-label="Submitted">Oct 7</td>
-              <td data-label="Review"><span class="badge amber">Pending</span></td>
-            </tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>
       </section>
       <p class="muted">An email match alone does not verify a sender or grant customer portal access.</p>
-      <footer>ClientFlow · Static UI with dummy data · No backend</footer>
+      <footer>ClientFlow · Inquiry records</footer>
     </main>
   </div>
-  <script src="app.js"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+  <script>
+    // The Update button is only enabled once the status is changed.
+    document.querySelectorAll('.review-form').forEach(function (form) {
+      var select = form.querySelector('.review-select');
+      var button = form.querySelector('.review-save');
+      select.addEventListener('change', function () {
+        button.disabled = select.value === select.dataset.initial;
+      });
+    });
+  </script>
 </body>
 </html>

@@ -10,7 +10,7 @@
 <body>
   <!-- Shared navigation. All links open separate HTML pages. -->
   <aside class="sidebar">
-    <a class="brand" href={ url 'dashboard' %}>ClientFlow<span>.</span></a>
+    <a class="brand" href={% url 'dashboard' %}>ClientFlow<span>.</span></a>
     <p class="eyebrow">WORKSPACE</p>
     <nav aria-label="Main navigation">
           <a href={% url 'client' %} class="active">My workspace</a>
@@ -77,6 +77,6 @@
       <footer>ClientFlow · Static UI with dummy data · No backend</footer>
     </main>
   </div>
-  <script src="app.js"></script>
+  <script src={% static 'app.js' %}></script>
 </body>
 </html>
